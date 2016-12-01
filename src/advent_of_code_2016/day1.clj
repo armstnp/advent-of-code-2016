@@ -39,9 +39,9 @@
   [[x y] dir steps]
   (case dir
     :north [x (+ y steps)]
-    :east [(+ x steps) y]
+    :east  [(+ x steps) y]
     :south [x (- y steps)]
-    :west [(- x steps) y]))
+    :west  [(- x steps) y]))
 
 (defn rotate-and-move
   [{:keys [coords dir]} {:keys [rotation steps]}]
@@ -54,9 +54,13 @@
   [movements]
   (reduce rotate-and-move initial-state movements))
 
+(defn abs
+  [x]
+  (max x (- x)))
+
 (defn distance
   [{[x y] :coords}]
-  (+ (Math/abs x) (Math/abs y)))
+  (+ (abs x) (abs y)))
 
 (def walk-distance (comp distance walk parse-input))
 
@@ -69,7 +73,51 @@
 (def test-3 (walk-distance "R5, L5, R5, R3"))
 (assert (= test-3 12))
 
-(def problem-1-input (slurp (io/resource "day-1-input.txt")))
-(def problem-1-output (walk-distance problem-input))
+(def problem-input (slurp (io/resource "day-1-input.txt")))
+(def problem-A-output (walk-distance problem-input))
 
-(prn problem-1-output)
+(prn problem-A-output)
+
+;; Day 1-B - code edited above where non-interfering with existing logic
+
+(defn repeat-n
+  [n x]
+  (take n (repeat x)))
+
+(defn walk-sequence
+  [curr-dir movements]
+  (lazy-seq
+    (if (empty? movements)
+      []
+      (let [[{:keys [rotation steps]}] movements
+            new-dir (rotate curr-dir rotation)]
+        (concat (repeat-n steps new-dir)
+                (walk-sequence new-dir (rest movements)))))))
+
+(defn step
+  [coords dir]
+  (move coords dir 1))
+
+(defn position-sequence
+  [movements]
+  (reductions step [0 0] (walk-sequence :north movements)))
+
+(defn first-duplicate
+  [coll]
+  (reduce (fn [acc x]
+            (if (contains? acc x)
+              (reduced x)
+              (conj acc x)))
+          #{}
+          coll))
+
+(defn wrap-coords
+  [coords]
+  {:coords coords})
+
+(def first-loopback-distance (comp distance wrap-coords first-duplicate position-sequence parse-input))
+
+(def test-4 (first-loopback-distance "R8 R4 R4 R8"))
+(assert (= test-4 4))
+
+(def problem-B-output (first-loopback-distance problem-input))
