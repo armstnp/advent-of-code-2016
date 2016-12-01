@@ -1,1 +1,7 @@
-Leiningen.gitignore
+hs_err_pid*.log
+pom.xml
+pom.xml.asc
+**/gen
+**/target
+.*
+!.gitignore
