@@ -3,7 +3,6 @@
             [clojure.java.io :as io]))
 
 ;; Coords format optimized for indexing: [row col]
-;; Clamped 0-2
     
 (def problem-input (slurp (io/resource "day-2-input.txt")))
 
