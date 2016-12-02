@@ -24,7 +24,7 @@
             [  5   6   7   8   9]
             [nil  \A  \B  \C nil]
             [nil nil  \D nil nil]]
-   :start [2 2]})
+   :start [2 0]})
 
 (defn clamp
   [n min-val max-val]
