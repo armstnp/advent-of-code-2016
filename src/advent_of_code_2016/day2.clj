@@ -4,8 +4,8 @@
 
 ;; Coords format optimized for indexing: [row col]
 ;; Clamped 0-2
-
-(def initial-button [1 1])
+    
+(def problem-input (slurp (io/resource "day-2-input.txt")))
 
 (def translation
   {\U [-1  0]
@@ -14,16 +14,18 @@
    \R [ 0  1]})
 
 (def simple-pad
-  [[1 2 3]
-   [4 5 6]
-   [7 8 9]])
+  {:layout [[1 2 3]
+            [4 5 6]
+            [7 8 9]]
+   :start [1 1]})
 
 (def complex-pad
-  [[nil nil   1 nil nil]
-   [nil   2   3   4 nil]
-   [  5   6   7   8   9]
-   [nil  \A  \B  \C nil]
-   [nil nil  \D nil nil]])
+  {:layout [[nil nil   1 nil nil]
+            [nil   2   3   4 nil]
+            [  5   6   7   8   9]
+            [nil  \A  \B  \C nil]
+            [nil nil  \D nil nil]]
+   :start [2 2]})
 
 (defn clamp
   [n min-val max-val]
@@ -38,11 +40,9 @@
       new-button
       button)))
 
-(defn parse-input
-  [s]
-  (mapcat #(concat % [:press]) (str/split-lines s)))
-
 (defn move
+  "Returns a function that moves across or presses a button on
+  the provided button pad."
   [button-pad]
   (fn [{:keys [button pressed]} dir]
     (let [new-button (if (not= dir :press)
@@ -56,18 +56,22 @@
 
 (defn enter-pad
   [button-pad start-button directions]
-  (reduce (move button-pad) {:button start-button :pressed []} directions))
+  (reduce (move button-pad)
+          {:button start-button :pressed []}
+          directions))
+
+(defn parse-input
+  [s]
+  (mapcat #(concat % [:press]) (str/split-lines s)))
 
 (defn solve-problem
-  [s button-pad start-button]
+  [s {:keys [layout start]}]
   (->> s
        parse-input
-       (enter-pad button-pad start-button)
+       (enter-pad layout start)
        :pressed
        (apply str)
        prn))
-    
-(def problem-input (slurp (io/resource "day-2-input.txt")))
 
-(solve-problem problem-input simple-pad [1 1])
-(solve-problem problem-input complex-pad [2 2])
+(solve-problem problem-input simple-pad)
+(solve-problem problem-input complex-pad)
