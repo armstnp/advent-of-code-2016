@@ -77,8 +77,7 @@
        parse-input
        (enter-pad layout start)
        :pressed
-       (apply str)
-       prn))
+       (apply str)))
 
-(solve-problem problem-input simple-pad)
-(solve-problem problem-input complex-pad)
+(prn (solve-problem problem-input simple-pad))
+(prn (solve-problem problem-input complex-pad))
