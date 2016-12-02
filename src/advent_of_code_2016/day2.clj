@@ -79,5 +79,10 @@
        :pressed
        (apply str)))
 
+(def test-instructions
+  (str/join \newline ["ULL" "RRDDD" "LURDL" "UUUUD"]))
+(assert (= "1985" (solve-problem test-instructions simple-pad)))
+(assert (= "5DB3" (solve-problem test-instructions complex-pad)))
+
 (prn (solve-problem problem-input simple-pad))
 (prn (solve-problem problem-input complex-pad))
