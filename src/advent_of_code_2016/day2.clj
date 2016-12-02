@@ -40,19 +40,27 @@
       new-button
       button)))
 
+(defn move-button
+  [button-pad button dir]
+  (if (not= dir :press)
+    (translate-in-pad button-pad button dir)
+    button))
+
+(defn press-button
+  [button-pad button pressed dir]
+  (if (= dir :press)
+    (conj pressed (get-in button-pad button))
+    pressed))
+
 (defn move
   "Returns a function that moves across or presses a button on
   the provided button pad."
   [button-pad]
-  (fn [{:keys [button pressed]} dir]
-    (let [new-button (if (not= dir :press)
-                       (translate-in-pad button-pad button dir)
-                       button)
-          new-pressed (if (= dir :press)
-                        (conj pressed (get-in button-pad button))
-                        pressed)]
-      {:button new-button
-       :pressed new-pressed})))
+  (let [move-button (partial move-button button-pad)
+        press-button (partial press-button button-pad)]
+    (fn [{:keys [button pressed]} dir]
+      {:button (move-button button dir)
+       :pressed (press-button button pressed dir)})))
 
 (defn enter-pad
   [button-pad start-button directions]
