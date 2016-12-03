@@ -6,24 +6,32 @@
 (def problem-input (slurp (io/resource "day-3-input.txt")))
 
 (defn valid-triangle?
-  [a b c]
-  (let [[small mid large] (sort [a b c])]
+  [lengths]
+  (let [[small mid large] (sort lengths)]
     (> (+ small mid) large)))
 
-(->> problem-input
-     str/split-lines
-     (map #(re-seq #"\d+" %))
-     (map #(map ad-core/parse-int %))
-     (filter #(apply valid-triangle? %))
-     count
-     prn)
+(defn parse-input
+  [s]
+  (->> s
+       str/split-lines
+       (map #(map ad-core/parse-int
+                  (re-seq #"\d+" %)))))
+
+(defn count-valid-triangles
+  [triangles]
+  (count (filter valid-triangle? triangles)))
 
 (->> problem-input
-     str/split-lines
-     (map #(re-seq #"\d+" %))
-     (map #(map ad-core/parse-int %))
-     (partition 3)
-     (mapcat ad-core/transpose)
-     (filter #(apply valid-triangle? %))
-     count
+     parse-input
+     count-valid-triangles
+     prn)
+
+(defn read-triangles-vertically
+  [triangles]
+  (mapcat ad-core/transpose (partition 3 triangles)))
+
+(->> problem-input
+     parse-input
+     read-triangles-vertically
+     count-valid-triangles
      prn)
