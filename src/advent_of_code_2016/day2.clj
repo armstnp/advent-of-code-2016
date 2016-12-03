@@ -26,10 +26,6 @@
             [nil nil  \D nil nil]]
    :start [2 0]})
 
-(defn clamp
-  [n min-val max-val]
-  (max min-val (min max-val n)))
-
 (defn translate-in-pad
   [button-pad [row col :as button] dir]
   (let [[d-row d-col] (translation dir)

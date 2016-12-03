@@ -1,5 +1,6 @@
 (ns advent-of-code-2016.day3
-  (:require [clojure.string :as str]
+  (:require [advent-of-code-2016.core :as ad-core]
+            [clojure.string :as str]
             [clojure.java.io :as io]))
 
 (def problem-input (slurp (io/resource "day-3-input.txt")))
@@ -9,18 +10,10 @@
   (let [[small mid large] (sort [a b c])]
     (> (+ small mid) large)))
 
-(defn parse-int
-  [n]
-  (Integer/parseInt n))
-
-(defn transpose
-  [s]
-  (apply map vector s))
-
 (->> problem-input
      str/split-lines
      (map #(re-seq #"\d+" %))
-     (map #(map parse-int %))
+     (map #(map ad-core/parse-int %))
      (filter #(apply valid-triangle? %))
      count
      prn)
@@ -28,9 +21,9 @@
 (->> problem-input
      str/split-lines
      (map #(re-seq #"\d+" %))
-     (map #(map parse-int %))
+     (map #(map ad-core/parse-int %))
      (partition 3)
-     (mapcat transpose)
+     (mapcat ad-core/transpose)
      (filter #(apply valid-triangle? %))
      count
      prn)

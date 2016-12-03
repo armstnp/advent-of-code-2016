@@ -1,5 +1,6 @@
 (ns advent-of-code-2016.day1
-  (:require [clojure.set :as set]
+  (:require [advent-of-code-2016.core :as ad-core]
+            [clojure.set :as set]
             [clojure.java.io :as io]))
 
 (def problem-input (slurp (io/resource "day-1-input.txt")))
@@ -24,7 +25,7 @@
   [s]
   (let [[rot-char & steps-str] s]
     {:rotation (char->rotation rot-char)
-     :steps (Integer/parseInt (apply str steps-str))}))
+     :steps (ad-core/parse-int (apply str steps-str))}))
 
 (defn parse-input
   [s]
