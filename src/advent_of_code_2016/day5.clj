@@ -1,6 +1,7 @@
 (ns advent-of-code-2016.day5
   (:require [clojure.string :as str]
-            [clojure.java.io :as io])
+            [clojure.java.io :as io]
+            [swiss.arrows :refer :all])
   (:import [java.security MessageDigest]
            [java.math BigInteger]
            [java.nio ByteBuffer]))
@@ -34,17 +35,6 @@
         padding (apply str (repeat (- digest-size (count sig)) "0"))]
     (str padding sig)))
 
-;; Day 5-A Solution
-(->> (range)
-     (map #(str problem-input %))
-     (map raw-md5)
-     (filter valid-hash?)
-     (take 8)
-     (map hex-rep)
-     (map #(nth % 5))
-     (apply str)
-     println)
-
 (defn pos-val-nybbles
   "Returns the position and value nybbles from a given hash."
   [[_ _ _ _ _ position value]]
@@ -76,13 +66,23 @@
   (every? (complement nil?) pass))
 
 ;; Day 5-B
-(->> (range)
-     (map (comp raw-md5 #(str problem-input %)))
-     (filter valid-hash?)
-     (map (comp pos-val-nybbles hex-rep))
-     (filter valid-position?)
-     (reductions insert-pass-char empty-pass)
-     (filter pass-complete?)
-     first
-     (apply str)
-     println)
+(-<>> (range)
+      (map (comp raw-md5 #(str problem-input %)))
+      (filter valid-hash?)
+      (-<:p <>
+        ;; Part A
+        (->>
+          (take 8)
+          (map hex-rep)
+          (map #(nth % 5))
+          (apply str "Part A: ")
+          println)
+        ;; Part B
+        (->>
+          (map (comp pos-val-nybbles hex-rep))
+          (filter valid-position?)
+          (reductions insert-pass-char empty-pass)
+          (filter pass-complete?)
+          first
+          (apply str "Part B: ")
+          println)))
