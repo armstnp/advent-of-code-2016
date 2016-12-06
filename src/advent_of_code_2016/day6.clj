@@ -5,16 +5,17 @@
 
 (def problem-input (slurp (io/resource "day-6-input.txt")))
 
-(->> problem-input
-     str/split-lines
-     ad-core/transpose
-     (map frequencies)
-     (map #(sort-by (comp - second) %))
-     (map first))
+(defn max-min-freqs
+  [s]
+  (->> s
+       frequencies
+       (sort-by (comp - second))
+       (map first)
+       (apply (juxt first last))))
 
 (->> problem-input
      str/split-lines
      ad-core/transpose
-     (map frequencies)
-     (map #(sort-by second %))
-     (map first))
+     (map max-min-freqs)
+     ad-core/transpose
+     (map (partial apply str) ["Part A: " "Part B: "]))
