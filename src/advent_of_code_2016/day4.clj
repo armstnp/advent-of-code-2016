@@ -28,14 +28,14 @@
 (defn expected-checksum
   [name]
   (->> name
-       get-letter-freqs
+       letter-freqs
        (take 5)
        (map first)
        (apply str)))
 
 (defn matches-checksum?
   [{:keys [name checksum]}]
-  (= checksum (get-expected-checksum name)))
+  (= checksum (expected-checksum name)))
 
 ;; Solution to Day 4-A
 (->> problem-input
