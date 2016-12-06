@@ -34,16 +34,21 @@
         padding (apply str (repeat (- digest-size (count sig)) "0"))]
     (str padding sig)))
 
+(defn find-basic-pass
+  [prefix pass-length]
+  (->> (range)
+       (map #(str prefix %))
+       (map raw-md5)
+       (filter valid-hash?)
+       (take pass-length)
+       (map hex-rep)
+       (map #(nth % 5))
+       (apply str)))
+
+(assert (= "18f" (find-basic-pass "abc" 3)))
+
 ;; Day 5-A Solution
-(->> (range)
-     (map #(str problem-input %))
-     (map raw-md5)
-     (filter valid-hash?)
-     (take 8)
-     (map hex-rep)
-     (map #(nth % 5))
-     (apply str)
-     println)
+(println (find-basic-pass problem-input 8))
 
 (defn pos-val-nybbles
   "Returns the position and value nybbles from a given hash."
@@ -74,6 +79,15 @@
   "Returns whether the password has all its slots filled."
   [pass]
   (every? (complement nil?) pass))
+
+(assert (= [nil \5 nil nil \e nil nil nil]
+           (->> (range)
+                (map (comp raw-md5 #(str "abc" %)))
+                (filter valid-hash?)
+                (take 4)
+                (map (comp pos-val-nybbles hex-rep))
+                (filter valid-position?)
+                (reduce insert-pass-char empty-pass))))
 
 ;; Day 5-B
 (->> (range)

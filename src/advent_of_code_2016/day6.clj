@@ -11,11 +11,37 @@
        frequencies
        (sort-by (comp - second))
        (map first)
-       (apply (juxt first last))))
+       ((juxt first last))))
+
+(defn get-min-max-codes
+  [s]
+  (->> s
+       str/split-lines
+       ad-core/transpose
+       (map max-min-freqs)
+       ad-core/transpose
+       (map (partial apply str))))
+
+(assert (= '("easter" "advent")
+           (get-min-max-codes
+             (str/join \newline
+                       ["eedadn"
+                        "drvtee"
+                        "eandsr"
+                        "raavrd"
+                        "atevrs"
+                        "tsrnev"
+                        "sdttsa"
+                        "rasrtv"
+                        "nssdts"
+                        "ntnada"
+                        "svetve"
+                        "tesnvt"
+                        "vntsnd"
+                        "vrdear"
+                        "dvrsen"
+                        "enarar"]))))
 
 (->> problem-input
-     str/split-lines
-     ad-core/transpose
-     (map max-min-freqs)
-     ad-core/transpose
+     get-min-max-codes
      (map (partial apply str) ["Part A: " "Part B: "]))

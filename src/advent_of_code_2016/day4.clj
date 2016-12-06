@@ -37,6 +37,13 @@
   [{:keys [name checksum]}]
   (= checksum (expected-checksum name)))
 
+(assert (= [true true true false]
+           (map (comp matches-checksum? str->room)
+                ["aaaaa-bbb-z-y-x-123[abxyz]"
+                 "a-b-c-d-e-f-g-h-987[abcde]"
+                 "not-a-real-room-404[oarel]"
+                 "totally-real-room-200[decoy]"])))
+
 ;; Solution to Day 4-A
 (->> problem-input
      str/split-lines
@@ -61,6 +68,11 @@
   [{:keys [name id] :as room}]
   (let [room-cipher (assoc (cipher id) \- \space)]
     (assoc room :name (apply str (map room-cipher name)))))
+
+(assert (= "very encrypted name" (->> "qzmt-zixmtkozy-ivhz-343[xxxxx]"
+                                      str->room
+                                      shift-by-id
+                                      :name)))
 
 ;; Solution to Day 4-B
 (->> problem-input
