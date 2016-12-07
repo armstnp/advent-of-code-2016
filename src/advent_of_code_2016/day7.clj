@@ -33,6 +33,11 @@
   (and (some has-abba? (strip-hypernet ip))
        (every? (complement has-abba?) (only-hypernet ip))))
 
+(assert (supports-tls? "abba[mnop]qrst"))
+(assert (not (supports-tls? "abcd[bddb]xyyx")))
+(assert (not (supports-tls? "aaaa[qwer]tyui")))
+(assert (supports-tls? "ioxxoj[asdfgh]zxcvbn"))
+
 (defn aba?
   [[a b c]]
   (and (= a c) (not= a b)))
@@ -51,6 +56,11 @@
   (let [supernet-abas (->> ip strip-hypernet (mapcat abas) set)
         hypernet-babs (->> ip only-hypernet (mapcat abas) (map flip) set)]
     (not (empty? (set/intersection supernet-abas hypernet-babs)))))
+
+(assert (supports-ssl? "aba[bab]xyz"))
+(assert (not (supports-ssl? "xyx[xyx]xyx")))
+(assert (supports-ssl? "aaa[kek]eke"))
+(assert (supports-ssl? "zazbz[bzb]cdb"))
 
 ;; Part A + B
 (->> problem-input
