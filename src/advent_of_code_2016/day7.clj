@@ -1,6 +1,5 @@
 (ns advent-of-code-2016.day7
-  (:require [advent-of-code-2016.core :as ad-core :refer [parse-int]]
-            [clojure.string :as str]
+  (:require [clojure.string :as str]
             [clojure.java.io :as io]
             [clojure.set :as set]))
 
