@@ -1,22 +1,36 @@
 (ns advent-of-code-2016.day8
-  (:require [advent-of-code-2016.core :as ad-core :refer [transpose parse-int]]
+  (:require [advent-of-code-2016.core :refer [transpose parse-int defn-split]]
             [clojure.string :as str]
             [clojure.java.io :as io]
             [clojure.set :as set]))
 
 (def problem-input (slurp (io/resource "day-8-input.txt")))
 
+(def screen-width 50)
+(def screen-height 6)
+(def pixel-off \space)
+(def pixel-on \#)
+(def starting-screen
+  (->> pixel-off (repeat screen-width) vec
+                 (repeat screen-height) vec))
+
+(defn line
+  [row line-width]
+  (vec (concat (repeat line-width pixel-on)
+               (drop line-width row))))
+
 (defn rectangle
   [screen rect-width rect-height]
-  (vec (map-indexed (fn [row-n row]
-                      (if (< row-n rect-height)
-                        (vec (concat (repeat rect-width \#) (drop rect-width row)))
-                        row))
-                    screen)))
+  (->> screen
+       (map-indexed (fn [row-n row]
+                      (if (>= row-n rect-height)
+                        row
+                        (line row rect-width))))
+       vec))
 
 (defn rotate-row
-  [screen row by-pixels]
-  (update screen row
+  [screen row-n by-pixels]
+  (update screen row-n
     #(let [width (count %)]
        (->> %
             cycle
@@ -28,20 +42,19 @@
   [screen column by-pixels]
   (-> screen transpose (rotate-row column by-pixels) transpose))
 
-(defn parse-rect-instruction
-  [s]
-  (if-let [match (re-matches #"rect (\d+)x(\d+)" s)]
-    {:op rectangle :params (map parse-int (next match))}))
+(defn-split gen-parser
+  [pattern op | s]
+  (if-let [[full-match & args] (re-matches pattern s)]
+    {:op op
+     :params (map parse-int args)}))
 
-(defn parse-rotate-row-instruction
-  [s]
-  (if-let [match (re-matches #"rotate row y=(\d+) by (\d+)" s)]
-    {:op rotate-row :params (map parse-int (next match))}))
+(def parse-rect-instruction (gen-parser #"rect (\d+)x(\d+)" rectangle))
 
-(defn parse-rotate-col-instruction
-  [s]
-  (if-let [match (re-matches #"rotate column x=(\d+) by (\d+)" s)]
-    {:op rotate-column :params (map parse-int (next match))}))
+(def parse-rotate-row-instruction
+  (gen-parser #"rotate row y=(\d+) by (\d+)" rotate-row))
+
+(def parse-rotate-col-instruction
+  (gen-parser #"rotate column x=(\d+) by (\d+)" rotate-column))
 
 (def try-parse-all (juxt parse-rect-instruction
                          parse-rotate-row-instruction
@@ -55,20 +68,24 @@
   [screen {:keys [op params]}]
   (apply op screen params))
 
-(def starting-screen (vec (repeat 6 (vec (repeat 50 \space)))))
+(def ending-screen
+  (->> problem-input
+       str/split-lines
+       (map parse-instruction)
+       (reduce apply-instruction starting-screen)))
 
-(->> problem-input
-     str/split-lines
-     (map parse-instruction)
-     (reduce apply-instruction starting-screen)
+(defn pixel-on?
+  [pixel]
+  (= pixel pixel-on))
+
+;; Part A
+(->> ending-screen
      (mapcat identity)
-     (filter #(= \# %))
+     (filter #(= pixel-on %))
      count)
 
-(->> problem-input
-     str/split-lines
-     (map parse-instruction)
-     (reduce apply-instruction starting-screen)
+;; Part B
+(->> ending-screen
      (map #(apply str %))
      (str/join \newline)
      println)
