@@ -2,7 +2,9 @@
 
 (defn parse-int
   [n]
-  (Integer/parseInt n))
+  (try
+    (Integer/parseInt n)
+    (catch Exception e (println "Failed to parse int: " n))))
 
 (defn transpose
   "Transposes the given nested sequence into nested vectors, as
